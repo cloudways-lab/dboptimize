@@ -58,8 +58,8 @@ class WP_Optm_CLI_Command extends WP_CLI_Command {
 			return;
 		}
 
-
-
+		
+	
 		WP_CLI::log('usage: wp dboptimize <command> [--optimization-id=<optimization-id>] [--site-id=<site-id>] [--param1=value1] [--param2=value2] ...');
 		WP_CLI::log("\n".__('These are common WP-DBOptimize commands used in various situations:', 'wp-optimize')."\n");
 
@@ -68,6 +68,18 @@ class WP_Optm_CLI_Command extends WP_CLI_Command {
 			'sites' => __('Display list of sites in a WP multisite installation.', 'wp-dboptimize'),
 			'optimizations' => __('Display available optimizations', 'wp-dboptimize'),
 			'do-optimization' => __('Do selected optimization', 'wp-dboptimize'),
+			// // Page cache
+			// 'cache enable' => __('Enable the page cache', 'wp-optimize'),
+			// 'cache disable' => __('Disable the page cache', 'wp-optimize'),
+			// 'cache purge' => __('Purge contents from the page cache', 'wp-optimize'),
+			// 'cache preload' => __('Preload contents into the page cache', 'wp-optimize'),
+			// 'cache status' => __('Get the current page cache status', 'wp-optimize'),
+			// // Minification
+			// 'minify enable' => __('Enable minification.', 'wp-optimize'). ' ' .sprintf(__('%s can be used to enable a specific minification feature.', 'wp-optimize'), '--feature=xxx'),
+			// 'minify disable' => __('Disable minification.', 'wp-optimize'). ' ' .sprintf(__('%s can be used to disable a specific minification feature.', 'wp-optimize'), '--feature=xxx'),
+			// 'minify status' => __('Get the current minification status.', 'wp-optimize'),
+			// 'minify regenerate' => __('Regenerate the minified files, and purge any supported page cache.', 'wp-optimize'),
+			// 'minify delete' => __('Removed all created minified files created, and purge any supported page caches.', 'wp-optimize')
 		);
 
 		foreach ($commands as $command => $description) {
@@ -88,7 +100,7 @@ class WP_Optm_CLI_Command extends WP_CLI_Command {
 	public function optimizations() {
 		$optimizer = WP_DbOptimize()->get_optimizer();
 
-
+		
 		$optimizations = $optimizer->sort_optimizations($optimizer->get_optimizations());
 
 		foreach ($optimizations as $id => $optimization) {
