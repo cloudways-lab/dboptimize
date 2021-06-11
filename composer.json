@@ -1,5 +1,5 @@
 {
-    "name": "wpcli/dboptimize",
+    "name": "dboptimize",
     "type": "wp-cli-package",
     "description": "",
     "license": "MIT",
