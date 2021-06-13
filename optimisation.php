@@ -8,28 +8,7 @@ if (!defined('WPODB_VERSION')) define('WPODB_VERSION', '1.0.0');
 class WP_Optm_CLI_Command extends WP_CLI_Command {
 
 
-	private $template_directories;
-
-	protected static $_instance = null;
-
-	protected static $_optimizer_instance = null;
-
-	protected static $_options_instance = null;
-
-	protected static $_minify_instance = null;
-
-	protected static $_notices_instance = null;
-
-	protected static $_logger_instance = null;
-
-	protected static $_browser_cache = null;
-
-	protected static $_db_info = null;
-
-	protected static $_cache = null;
-
-	protected static $_gzip_compression = null;
-
+	
 	/**
 	 * Command line params.
 	 *
@@ -38,8 +17,6 @@ class WP_Optm_CLI_Command extends WP_CLI_Command {
 	private $args;
 
 	/**
-	 * Controls WP-Optimize. Run 'wp optimize' to get a list of the available subcommands.
-	 * Requires PHP 5.3+; but then, so does WP-CLI (The first line appears in the help section of WP_CLI, when running `wp`)
 	 *
 	 * @param array $args 		command line params.
 	 * @param array $assoc_args command line params in associative array.
@@ -68,18 +45,6 @@ class WP_Optm_CLI_Command extends WP_CLI_Command {
 			'sites' => __('Display list of sites in a WP multisite installation.', 'wp-dboptimize'),
 			'optimizations' => __('Display available optimizations', 'wp-dboptimize'),
 			'do-optimization' => __('Do selected optimization', 'wp-dboptimize'),
-			// // Page cache
-			// 'cache enable' => __('Enable the page cache', 'wp-optimize'),
-			// 'cache disable' => __('Disable the page cache', 'wp-optimize'),
-			// 'cache purge' => __('Purge contents from the page cache', 'wp-optimize'),
-			// 'cache preload' => __('Preload contents into the page cache', 'wp-optimize'),
-			// 'cache status' => __('Get the current page cache status', 'wp-optimize'),
-			// // Minification
-			// 'minify enable' => __('Enable minification.', 'wp-optimize'). ' ' .sprintf(__('%s can be used to enable a specific minification feature.', 'wp-optimize'), '--feature=xxx'),
-			// 'minify disable' => __('Disable minification.', 'wp-optimize'). ' ' .sprintf(__('%s can be used to disable a specific minification feature.', 'wp-optimize'), '--feature=xxx'),
-			// 'minify status' => __('Get the current minification status.', 'wp-optimize'),
-			// 'minify regenerate' => __('Regenerate the minified files, and purge any supported page cache.', 'wp-optimize'),
-			// 'minify delete' => __('Removed all created minified files created, and purge any supported page caches.', 'wp-optimize')
 		);
 
 		foreach ($commands as $command => $description) {
@@ -173,40 +138,6 @@ class WP_Optm_CLI_Command extends WP_CLI_Command {
 				WP_CLI::success($message);
 			}
 		}
-	}
-
-	/**
-	 * Handle cache commands.
-	 */
-	public function cache() {
-		// Load page cache.
-		$this->get_page_cache();
-		$this->init_page_cache();
-
-		$available_commands = array(
-			'enable' => 'enable',
-			'disable' => 'disable',
-			'purge' => 'purge_page_cache',
-			'preload' => 'run_cache_preload_cli',
-			'status' => 'get_status_info',
-		);
-
-		$command = isset($this->args[1]) ? $this->args[1] : '';
-
-		if (!array_key_exists($command, $available_commands)) {
-			WP_CLI::error(__('Undefined command', 'wp-optimize'));
-		}
-
-		if (!class_exists('WP_DbOptimize_Cache_Commands')) include_once('cache/class-cache-commands.php');
-		$cache_commands = new WP_DbOptimize_Cache_Commands();
-
-		$result = call_user_func(array($cache_commands, $available_commands[$command]));
-
-		if (isset($result['error'])) {
-			WP_CLI::error($result['error']);
-		}
-
-		WP_CLI::success($result['message']);
 	}
 
 	/**

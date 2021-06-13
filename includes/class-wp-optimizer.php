@@ -1,8 +1,7 @@
 <?php
 
-
 /**
- * This class invokes optimiazations. The optimizations themselves live in the 'optimizations' sub-directory of the plugin.  The proper way to obtain access to the instance is via WP_DbOptimize()->get_optimizer()
+ * This class invokes optimiazations. The optimizations themselves live in the 'optimizations' sub-directory of the plugin.  The proper way to obtain access to the instance is via WP_Optimize()->get_optimizer()
  */
 class WP_DbOptimizer {
 	
@@ -34,13 +33,19 @@ class WP_DbOptimizer {
 	
 		$optimizations = array();
 		
-		$optimizations_dir = WPODB_PLUGIN_MAIN_PATH.'optimizations';
-		
+		$optimizations_dir = __DIR__.'/../optimizations';
+
+
 		if ($dh = opendir($optimizations_dir)) {
+
 			while (($file = readdir($dh)) !== false) {
+
 				if ('.' == $file || '..' == $file || '.php' != substr($file, -4, 4) || !is_file($optimizations_dir.'/'.$file) || 'inactive-' == substr($file, 0, 9)) continue;
 				$optimizations[] = substr($file, 0, (strlen($file) - 4));
+
 			}
+
+
 			closedir($dh);
 		}
 		
@@ -51,7 +56,7 @@ class WP_DbOptimizer {
 	/**
 	 * Currently, there is only one sort rule (so, the parameter's value is ignored)
 	 *
-	 * @param  array  $optimizations An array of optimizations 
+	 * @param  array  $optimizations An array of optimizations (i.e. WP_Optimization instances).
 	 * @param  string $sort_on       Specify sort.
 	 * @param  string $sort_rule     Sort Rule.
 	 * @return array
@@ -62,6 +67,7 @@ class WP_DbOptimizer {
 		} else {
 			uasort($optimizations, array($this, 'sort_optimizations_ui_traditional'));
 		}
+
 		return $optimizations;
 	}
 	
@@ -96,8 +102,8 @@ class WP_DbOptimizer {
 	 */
 	public function get_optimizations() {
 
-	
 		$optimizations = $this->get_optimizations_list();
+
 		$optimization_objects = array();
 		
 		foreach ($optimizations as $optimization) {
@@ -106,9 +112,11 @@ class WP_DbOptimizer {
 			if (is_wp_error($optimization_object)) {
 				WP_DbOptimize()->log('Failed to load optimization ' . $optimization . ' - ' . $optimization_object->get_error_message());
 			} else {
+
 				$optimization_objects[$optimization] = $optimization_object;
 			}
 		}
+
 	
 		return apply_filters('wp_dboptimize_get_optimizations', $optimization_objects);
 	
@@ -122,20 +130,20 @@ class WP_DbOptimizer {
 	 * @return array                      WP_Error Will return the optimization, or a WP_Error object if it was not found.
 	 */
 	public function get_optimization($which_optimization, $data = array()) {
-
-		
 		$optimization_class = apply_filters('wp_dboptimize_optimization_class', 'WP_DbOptimization_'.$which_optimization);
-		
-		if (!class_exists('WP_DbOptimization')) include_once('includes/class-wp-optimization.php');
+
+		if (!class_exists('WP_DbOptimization')) include_once('class-wp-optimization.php');
 	
 		if (!class_exists($optimization_class)) {
-			$optimization_file = 'optimizations/'.$which_optimization.'.php';
+			$optimization_file = __DIR__.'/../optimizations/'.$which_optimization.'.php';
+
 			$class_file = apply_filters('wp_dboptimize_optimization_class_file', $optimization_file);
 			if (!preg_match('/^[a-z]+$/', $which_optimization) || !file_exists($class_file)) {
 				return new WP_Error('no_such_optimization', __('No such optimization', 'wp-optimize'), $which_optimization);
 			}
 			
 			include_once($class_file);
+
 			
 			if (!class_exists($optimization_class)) {
 				return new WP_Error('no_such_optimization', __('No such optimization', 'wp-optimize'), $which_optimization);
@@ -147,8 +155,9 @@ class WP_DbOptimizer {
 			$options = WP_DbOptimize()->get_options();
 			$data['optimization_sites'] = $options->get_option('wpo-sites-cron', array('all'));
 		}
-		
 		$optimization = new $optimization_class($data);
+
+		
 		
 		return $optimization;
 	
@@ -157,7 +166,7 @@ class WP_DbOptimizer {
 	/**
 	 * The method to call to perform an optimization.
 	 *
-	 * @param  string|object $which_optimization An optimization ID
+	 * @param  string|object $which_optimization An optimization ID, or a WP_Optimization object.
 	 * @return array                             Array of results from the optimization.
 	 */
 	public function do_optimization($which_optimization) {
@@ -202,7 +211,7 @@ class WP_DbOptimizer {
 	 * The method to call to get information about an optimization.
 	 * As with do_optimization, it is somewhat modelled after the template interface
 	 *
-	 * @param  string|object $which_optimization An optimization ID
+	 * @param  string|object $which_optimization An optimization ID, or a WP_Optimization object.
 	 * @return array                             returns the optimization information
 	 */
 	public function get_optimization_info($which_optimization) {
