@@ -31,13 +31,13 @@ class WP_Optm_CLI_Command extends WP_CLI_Command {
 		}
 
 		if (!empty($args) && is_callable(array($this, $args[0]))) {
-			call_user_func(array($this, $args[0]), $assoc_args);
+			call_user_func(array($this, $args[0]), $args[1], $assoc_args);
 			return;
 		}
 
 		
 	
-		WP_CLI::log('usage: wp dboptimize <command> [--optimization-id=<optimization-id>] [--site-id=<site-id>] [--param1=value1] [--param2=value2] ...');
+		WP_CLI::log('usage: wp dboptimize <command> <optimization-id> [--site-id=<site-id>] [--param1=value1] [--param2=value2] ...');
 		WP_CLI::log("\n".__('These are common WP-DBOptimize commands used in various situations:', 'wp-optimize')."\n");
 
 		$commands = array(
@@ -79,6 +79,25 @@ class WP_Optm_CLI_Command extends WP_CLI_Command {
 		}
 	}
 
+	public function all_optimizations()
+	{
+		$optimizer = WP_DbOptimize()->get_optimizer();
+
+		$optimizations = $optimizer->sort_optimizations($optimizer->get_optimizations());
+		$ret = [];
+		foreach ($optimizations as $id => $optimization) {
+
+			if (false === $optimization->display_in_optimizations_list()) continue;
+
+			// This is an array, with attributes dom_id, activated, settings_label, info; all values are strings.
+			$html = $optimization->get_settings_html();
+
+			$ret[] = $id;
+		}
+
+		return $ret;
+	}
+
 	/**
 	 * Display list of sites when on a multisite install
 	 */
@@ -100,11 +119,22 @@ class WP_Optm_CLI_Command extends WP_CLI_Command {
 	 *
 	 * @param array $assoc_args array with params for optimization, optimization_id item required.
 	 */
-	public function do_optimization($assoc_args) {
+	public function do_optimization($args, $assoc_args) {
 
-		if (!isset($assoc_args['optimization-id'])) {
-			WP_CLI::error(__('Please, select optimization.', 'wp-optimize'));
-			return;
+		// if (!isset($assoc_args['optimization-id'])) {
+		// 	WP_CLI::error(__('Please, select optimization.', 'wp-optimize'));
+		// 	return;
+		// }
+
+		// does all optmizations at once
+		if ($args == 'all') {
+			$all_optimizations  = $this->all_optimizations();
+			$assoc_args['optimization-id'] = implode(',', $all_optimizations);		
+
+		} else {
+			if ($args) {
+				$assoc_args['optimization-id'] = $args;			
+			}	
 		}
 
 		if (isset($assoc_args['site-id'])) {
@@ -118,10 +148,14 @@ class WP_Optm_CLI_Command extends WP_CLI_Command {
 		}
 
 		// save posted parameters in data item to make them available in optimization.
+
 		$assoc_args['data'] = $assoc_args;
+
+		
 
 		// get array with optimization ids.
 		$optimizations_ids = array_values(array_map('trim', explode(',', $assoc_args['optimization-id'])));
+		
 
 		foreach ($optimizations_ids as $optimization_id) {
 			$assoc_args['optimization_id'] = $optimization_id;
