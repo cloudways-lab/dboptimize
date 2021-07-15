@@ -7,7 +7,7 @@ To view commands
 
 > wp dboptimize
 
-usage: wp dboptimize <command> [--optimization-id=<optimization-id>] [--site-id=<site-id>] [--param1=value1] [--param2=value2] ...
+usage: wp dboptimize <command> [operation] [--site-id=<site-id>] [--param1=value1] [--param2=value2] ...
 
 These are common WP-DBOptimize commands used in various situations:
 
@@ -16,9 +16,10 @@ These are common WP-DBOptimize commands used in various situations:
     optimizations        Display available optimizations
     do-optimization  Do selected optimization
 
+To run all optimizations
+> wp dboptimize do-optimization --all
 
 To view all optimizations
-
 
 > wp dboptimize optimizations
 
@@ -36,9 +37,11 @@ To view all optimizations
     commentmeta          Clean comment meta data
     orphandata                Clean orphaned relationship data
 
+
+
 How to use
 eg:
-wp dboptimize do-optimization --optimization-id=trash
+wp dboptimize do-optimization trash
 
 Likewise replace "trash" with any other commands available above
 
