@@ -17,7 +17,7 @@ These are common WP-DBOptimize commands used in various situations:
     do-optimization  Do selected optimization
 
 To run all optimizations
-> wp dboptimize do-optimization --all
+> wp dboptimize do-optimization all
 
 To view all optimizations
 
