@@ -25,12 +25,18 @@ class WP_Optm_CLI_Command extends WP_CLI_Command {
 
 		$this->args = $args;
 
+
 		// change underscores to hypes in command.
 		if (isset($args[0])) {
 			$args[0] = str_replace('-', '_', $args[0]);
 		}
 
-		if (!empty($args) && is_callable(array($this, $args[0]))) {
+		if (!empty($args) && is_callable(array($this, $args[0])) && $args[0] === 'optimizations') {
+			call_user_func(array($this, $args[0]), $assoc_args);
+			return;
+		}
+
+		if (!empty($args) && is_callable(array($this, $args[0])) && isset($args[1])) {
 			call_user_func(array($this, $args[0]), $args[1], $assoc_args);
 			return;
 		}
