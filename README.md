@@ -24,18 +24,20 @@ To view all optimizations
 > wp dboptimize optimizations
 
     actionscheduler          Delete Action schedulers
-    optimizetables            Optimize database tables
-    revisions                        Clean all post revisions
-    autodraft                      Clean all auto-draft posts
-    trash                                Clean all trashed posts
-    spam                              Remove spam and trashed comments
-    unapproved                Remove unapproved comments
-    transient                        Remove expired transient options
-    pingbacks                    Remove pingbacks
-    trackbacks                    Remove trackbacks
-    postmeta                      Clean post meta data
-    commentmeta          Clean comment meta data
-    orphandata                Clean orphaned relationship data
+    optimizetables           Optimize database tables
+    revisions                Clean all post revisions
+    autodraft                Clean all auto-draft posts
+    trash                    Clean all trashed posts
+    spam                     Remove spam and trashed comments
+    unapproved               Remove unapproved comments
+    transient                Remove expired transient options
+    pingbacks                Remove pingbacks
+    trackbacks               Remove trackbacks
+    postmeta                 Clean post meta data
+    commentmeta              Clean comment meta data
+    orphandata               Clean orphaned relationship data
+    clearitemeslogs          Clean Ithemes Log files
+    
 
 
 
