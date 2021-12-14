@@ -24,8 +24,19 @@ class WP_Optm_CLI_Command extends WP_CLI_Command {
 	public function __invoke($args, $assoc_args) { // phpcs:ignore PHPCompatibility.FunctionNameRestrictions.NewMagicMethods.__invokeFound
 
 		$this->args = $args;
-
-
+		if ($assoc_args && $assoc_args['time']) {
+			if (!class_exists('WP_DbOptimize_Options')) include_once('includes/class-wp-optimize-options.php');
+			$optimizationOptions = new WP_DbOptimize_Options();
+			$optimizationOptions->update_option('retention-enabled', 'true');
+			$optimizationOptions->update_option('retention-period', $assoc_args['time']);
+		} else {
+			if (!class_exists('WP_DbOptimize_Options')) include_once('includes/class-wp-optimize-options.php');
+			$optimizationOptions = new WP_DbOptimize_Options();
+			$optimizationOptions->update_option('retention-enabled', 'true');
+			$optimizationOptions->update_option('retention-period', 2);
+		}
+		
+	
 		// change underscores to hypes in command.
 		if (isset($args[0])) {
 			$args[0] = str_replace('-', '_', $args[0]);
@@ -40,7 +51,8 @@ class WP_Optm_CLI_Command extends WP_CLI_Command {
 			call_user_func(array($this, $args[0]), $args[1], $assoc_args);
 			return;
 		}
-
+		
+	
 		
 	
 		WP_CLI::log('usage: wp dboptimize <command> <optimization-id> [--site-id=<site-id>] [--param1=value1] [--param2=value2] ...');

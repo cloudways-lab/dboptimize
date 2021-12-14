@@ -143,7 +143,6 @@ class WP_DbOptimization_spam extends WP_DbOptimization {
 	 */
 	public function delete_comments_by_type($type) {
 		$clean = "DELETE c, cm FROM `" . $this->wpdb->comments . "` c LEFT JOIN `" . $this->wpdb->commentmeta . "` cm ON c.comment_ID = cm.comment_id WHERE c.comment_approved = '{$type}'";
-
 		if ('true' == $this->retention_enabled) {
 			$clean .= ' and c.comment_date < NOW() - INTERVAL ' . $this->retention_period . ' WEEK';
 		}
@@ -246,7 +245,7 @@ class WP_DbOptimization_spam extends WP_DbOptimization {
 	public function settings_label() {
 	
 		if ('true' == $this->retention_enabled) {
-			return sprintf(__('Remove spam and trashed comments which are older than %d weeks', 'wp-dboptimize'), $this->retention_period);
+			return sprintf(__('Remove spam and trashed comments which are older than %d weeks. Use --time param to pass custom weeks', 'wp-dboptimize'), $this->retention_period);
 		} else {
 			return __('Remove spam and trashed comments', 'wp-dboptimize');
 		}
