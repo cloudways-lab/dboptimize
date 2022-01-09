@@ -171,7 +171,7 @@ class WP_DbOptimization_unapproved extends WP_DbOptimization {
 
 	public function settings_label() {
 		if ('true' == $this->retention_enabled) {
-			return sprintf(__('Remove unapproved comments which are older than %d weeks', 'wp-dboptimize'), $this->retention_period);
+			return sprintf(__('Remove unapproved comments which are older than %d weeks. Use --time param to pass custom weeks', 'wp-dboptimize'), $this->retention_period);
 		} else {
 			return __('Remove unapproved comments', 'wp-dboptimize');
 		}

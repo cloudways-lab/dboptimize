@@ -117,7 +117,6 @@ class WP_DbOptimization_autodraft extends WP_DbOptimization {
 	 * Do actions after get_info() function.
 	 */
 	public function after_get_info() {
-
 		if (0 != $this->found_count && null != $this->found_count) {
 			$message = sprintf(_n('%s auto draft post in your database', '%s auto draft posts in your database', $this->found_count, 'wp-dboptimize'), number_format_i18n($this->found_count));
 		} else {
@@ -159,7 +158,7 @@ class WP_DbOptimization_autodraft extends WP_DbOptimization {
 	public function settings_label() {
 
 		if ('true' == $this->retention_enabled) {
-			return sprintf(__('Clean auto draft posts which are older than %s weeks', 'wp-dboptimize'), $this->retention_period);
+			return sprintf(__('Clean auto draft posts which are older than %s weeks. Use --time param to pass custom weeks', 'wp-dboptimize'), $this->retention_period);
 		} else {
 			return __('Clean all auto-draft posts', 'wp-dboptimize');
 		}
