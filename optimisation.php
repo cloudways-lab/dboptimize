@@ -51,6 +51,11 @@ class WP_Optm_CLI_Command extends WP_CLI_Command {
 			call_user_func(array($this, $args[0]), $args[1], $assoc_args);
 			return;
 		}
+
+		if (!empty($args) && is_callable(array($this, $args[0])) && isset($args[1])) {
+			call_user_func(array($this, $args[0]), $args[1], $assoc_args);
+			return;
+		}
 		
 	
 		
@@ -102,15 +107,16 @@ class WP_Optm_CLI_Command extends WP_CLI_Command {
 		$optimizer = WP_DbOptimize()->get_optimizer();
 
 		$optimizations = $optimizer->sort_optimizations($optimizer->get_optimizations());
+		
 		$ret = [];
 		foreach ($optimizations as $id => $optimization) {
-
-			if (false === $optimization->display_in_optimizations_list()) continue;
-
-			// This is an array, with attributes dom_id, activated, settings_label, info; all values are strings.
-			$html = $optimization->get_settings_html();
-
-			$ret[] = $id;
+			
+			if ($id !== 'wpindexfixer') {
+				if (false === $optimization->display_in_optimizations_list()) continue;
+				// This is an array, with attributes dom_id, activated, settings_label, info; all values are strings.
+				$html = $optimization->get_settings_html();
+				$ret[] = $id;
+			}
 		}
 
 		return $ret;
