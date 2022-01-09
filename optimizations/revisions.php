@@ -220,11 +220,11 @@ class WP_DbOptimization_revisions extends WP_DbOptimization {
 	public function settings_label() {
 	
 		if ('true' == $this->retention_enabled && 'true' == $this->revisions_retention_enabled) {
-			return sprintf(__('Clean post revisions which are older than %d weeks and keep at least %d revisions', 'wp-dboptimize'), $this->retention_period, $this->revisions_retention_count);
+			return sprintf(__('Clean post revisions which are older than %d weeks and keep at least %d revisions. Use --time param to pass custom weeks', 'wp-dboptimize'), $this->retention_period, $this->revisions_retention_count);
 		}
 
 		if ('true' == $this->retention_enabled && 'false' == $this->revisions_retention_enabled) {
-			return sprintf(__('Clean post revisions which are older than %d weeks', 'wp-dboptimize'), $this->retention_period);
+			return sprintf(__('Clean post revisions which are older than %d weeks. Use --time param to pass custom weeks', 'wp-dboptimize'), $this->retention_period);
 		}
 
 		if ('false' == $this->retention_enabled && 'true' == $this->revisions_retention_enabled) {
