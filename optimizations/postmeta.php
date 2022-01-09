@@ -81,7 +81,15 @@ class WP_DbOptimization_postmeta extends WP_DbOptimization {
 		$clean .= ";";
 
 		$postmeta = $this->query($clean);
+		
 		$this->processed_count += $postmeta;
+
+		// _oembed delete
+		$clean_oembed = "DELETE FROM `".$this->wpdb->postmeta."` WHERE meta_key like '%_oembed%' ";
+		$postmeta_oembed = $this->query($clean_oembed);
+		$this->processed_count += $postmeta_oembed;
+
+		
 	}
 
 	/**
@@ -114,6 +122,11 @@ class WP_DbOptimization_postmeta extends WP_DbOptimization {
 		$postmeta = $this->wpdb->get_var($sql);
 
 		$this->found_count += $postmeta;
+
+		$sql = "SELECT COUNT(*) FROM `".$this->wpdb->postmeta." WHERE meta_key like '%_oembed%'`";
+		$postmeta = $this->wpdb->get_var($sql);
+		$this->found_count += $postmeta;
+
 	}
 
 	public function settings_label() {
