@@ -39,6 +39,8 @@ To view all optimizations
     commentmeta              Clean comment meta data
     orphandata               Clean orphaned relationship data
     clearitemeslogs          Clean Ithemes Log files
+    woocommerce              Clean Sessions for woocommerce
+    postmeta                 Clean Post Meta ( embed leftovers etc )
     
 
 
