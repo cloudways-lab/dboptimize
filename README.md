@@ -26,6 +26,7 @@ To view all optimizations
 
     actionscheduler          Delete Action schedulers
     optimizetables           Optimize database tables
+    wpindexfixer             Adds Indexes to WordPress default tables ( not included to all )
     revisions                Clean all post revisions
     autodraft                Clean all auto-draft posts
     trash                    Clean all trashed posts
