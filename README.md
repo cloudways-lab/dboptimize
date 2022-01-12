@@ -41,7 +41,7 @@ To view all optimizations
     clearitemeslogs          Clean Ithemes Log files
     woocommerce              Clean Sessions for woocommerce
     postmeta                 Clean Post Meta ( embed leftovers etc )
-    
+
 
 
 
@@ -50,6 +50,16 @@ eg:
 wp dboptimize do-optimization trash
 
 Likewise replace "trash" with any other commands available above
+
+## Changes Log
+v1.1
+* Added Actions for Automation Testing
+v1.0.1
+* Added iThemes Log clear
+* Added WooCommerce Session Clear
+* Added Post Meta Clear
+v1.0.0
+* Added First Package Settings
 
 ## Installing
 
