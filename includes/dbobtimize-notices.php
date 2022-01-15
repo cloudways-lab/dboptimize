@@ -4,7 +4,7 @@
 /**
  * If we ever change the API of the Updraft_Notices class, then we'll need to rename and version it, e.g. Updraft_Notices_1_0, because otherwise a plugin may find that it's loaded an older instance than it wanted from another plugin.
  */
-abstract class Updraft_Notices_1_0 {
+abstract class DbOptimize_Notices_1_0 {
 
 	protected $notices_content;
 	
@@ -35,53 +35,14 @@ abstract class Updraft_Notices_1_0 {
 	 */
 	abstract protected function notices_init();
 	
-	public function is_plugin_installed($product = null, $also_require_active = false) {
-		if ($also_require_active) return class_exists($product);
-		if (!function_exists('get_plugins')) include_once(ABSPATH.'wp-admin/includes/plugin.php');
-		$plugins = get_plugins();
-		foreach ($plugins as $value) {
-			if ($value['TextDomain'] == $product) {
-				// We have found the plugin so return false so that we do not display this advert.
-				return false;
-			}
-		}
-		return true;
-	}
 
-	protected function translation_needed($plugin_base_dir, $product_name) {
-		$wplang = get_locale();
-		if (strlen($wplang) < 1 || 'en_US' == $wplang || 'en_GB' == $wplang) return false;
-		if (defined('WP_LANG_DIR') && is_file(WP_LANG_DIR.'/plugins/'.$product_name.'-'.$wplang.'.mo')) return false;
-		if (is_file($plugin_base_dir.'/languages/'.$product_name.'-'.$wplang.'.mo')) return false;
-		return true;
-	}
-	
-	protected function url_start($html_allowed, $url, $https = false, $website_home = null) {
-		$proto = ($https) ? 'https' : 'http';
-		if (strpos($url, $website_home) !== false) {
-			return (($html_allowed) ? "<a href=".apply_filters(str_replace('.', '_', $website_home).'_link', $proto.'://'.$url).">" : "");
-		} else {
-			return (($html_allowed) ? '<a href="'.$proto.'://'.$url.'">' : "");
-		}
-	}
 
 	protected function url_end($html_allowed, $url, $https = false) {
 		$proto = (($https) ? 'https' : 'http');
 		return (($html_allowed) ? '</a>' : " (".$proto."://".$url.")");
 	}
 
-	public function do_notice($notice = false, $position = 'top', $return_instead_of_echo = false) {
 
-		$this->notices_init();
-	
-		if (false === $notice) $notice = apply_filters('updraft_notices_force_id', false, $this);
-		
-		$notice_content = $this->get_notice_data($notice, $position);
-		
-		if (false != $notice_content) {
-			return $this->render_specified_notice($notice_content, $return_instead_of_echo, $position);
-		}
-	}
 
 	/**
 	 * This method will return a notice ready for display.

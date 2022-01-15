@@ -1,35 +1,33 @@
 <?php
 
+require_once('class-dboptimize-logger-interface.php');
+require_once('class-dboptimize-log-levels.php');
+require_once('class-dboptimize-logger.php');
 
-require_once('class-updraft-logger-interface.php');
-require_once('class-updraft-log-levels.php');
-require_once('class-updraft-abstract-logger.php');
-require_once('class-updraft-logger.php');
-
-if (class_exists('Updraft_Logger')) return;
+if (class_exists('DbOptimize_Logger')) return;
 
 /**
- * Class Updraft_Logger
+ * Class DbOptimize_Logger
  */
-class Updraft_Logger implements Updraft_Logger_Interface {
+class DbOptimize_Logger implements DbOptimize_Logger_Interface {
 	
 	protected $_loggers = array();
 
 	/**
 	 * Constructor method
 	 *
-	 * @param Updraft_Logger_Interface $logger
+	 * @param DbOptimize_Logger_Interface $logger
 	 */
-	public function __construct(Updraft_Logger_Interface $logger = null) {
+	public function __construct(DbOptimize_Logger_Interface $logger = null) {
 		if (!empty($logger)) $this->_loggers = array($logger);
 	}
 
 	/**
 	 * Add logger to loggers list
 	 *
-	 * @param Updraft_Logger_Interface $logger
+	 * @param DbOptimize_Logger_Interface $logger
 	 */
-	public function add_logger(Updraft_Logger_Interface $logger) {
+	public function add_logger(DbOptimize_Logger_Interface $logger) {
 		$logger_id = $logger_class = get_class($logger);
 
 		// don't add logger if it doesn't support multiple loggers.

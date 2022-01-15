@@ -41,8 +41,8 @@ class WP_Optm_CLI_Command extends WP_CLI_Command {
 		if (isset($args[0])) {
 			$args[0] = str_replace('-', '_', $args[0]);
 		}
-
-		if (!empty($args) && is_callable(array($this, $args[0])) && $args[0] === 'optimizations') {
+		
+		if (!empty($args) && is_callable(array($this, $args[0])) && ($args[0] === 'optimizations' || $args[0] === 'version' || $args[0] === 'sites')) {
 			call_user_func(array($this, $args[0]), $assoc_args);
 			return;
 		}
@@ -205,9 +205,9 @@ class WP_Optm_CLI_Command extends WP_CLI_Command {
 	 */
 	private function get_commands() {
 		// Other commands, available for any remote method.
-		if (!class_exists('WPCLI_DbOptimize_Commands')) include_once('class-commands.php');
+		if (!class_exists('WP_DbOptimize_Commands')) include_once('includes/class-dboptimize-commands.php');
 
-		return new WPCLI_DbOptimize_Commands();
+		return new WP_DbOptimize_Commands();
 	}
 
 
