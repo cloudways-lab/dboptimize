@@ -14,8 +14,7 @@ class WP_DbOptimize {
 
 	protected static $_options_instance = null;
 
-	protected static $_notices_instance = null;
-
+	
 	protected static $_logger_instance = null;
 
 	protected static $_browser_cache = null;
@@ -60,14 +59,6 @@ class WP_DbOptimize {
 		return self::$_options_instance;
 	}
 
-	public static function get_notices() {
-		if (empty(self::$_notices_instance)) {
-			if (!class_exists('WP_DbOptimize_Notices')) include_once('includes/wp-optimize-notices.php');
-			self::$_notices_instance = new WP_DbOptimize_Notices();
-		}
-		return self::$_notices_instance;
-	}
-
 	/**
 	 * Returns instance if WPO_Page_Cache class.
 	 *
@@ -103,33 +94,6 @@ class WP_DbOptimize {
 			self::$_db_info = new WP_DbOptimize_Database_Information();
 		}
 		return self::$_db_info;
-	}
-
-	/**
-	 * Returns instance of WP_Optimize_Gzip_Compression.
-	 *
-	 * @return WP_Optimize_Gzip_Compression
-	 */
-	static public function get_gzip_compression() {
-		if (empty(self::$_gzip_compression)) {
-			if (!class_exists('WP_DbOptimize_Gzip_Compression')) include_once('includes/class-wp-optimize-gzip-compression.php');
-			self::$_gzip_compression = new WP_DbOptimize_Gzip_Compression();
-		}
-		return self::$_gzip_compression;
-	}
-
-	/**
-	 * Create instance of WP_Optimize_Htaccess.
-	 *
-	 * @param string $htaccess_file absolute path to htaccess file, by default it use .htaccess in WordPress root directory.
-	 * @return WP_Optimize_Htaccess
-	 */
-	public static function get_htaccess($htaccess_file = '') {
-		if (!class_exists('WP_DbOptimize_Cache')) {
-			include_once('includes/class-wp-optimize-htaccess.php');
-		}
-
-		return new WP_Optimize_Htaccess($htaccess_file);
 	}
 
 	/**
@@ -261,69 +225,6 @@ class WP_DbOptimize {
 	}
 
 
-	
-	/**
-	 * Schedules cron event based on selected schedule type
-	 *
-	 * @return void
-	 */
-	public function cron_activate() {
-		$gmt_offset = (int) (3600 * get_option('gmt_offset'));
-
-		$options = $this->get_options();
-
-		if ($options->get_option('schedule') === false) {
-			$options->set_default_options();
-		} else {
-			if ('true' == $options->get_option('schedule')) {
-				if (!wp_next_scheduled('wpo_cron_event2')) {
-					$schedule_type = $options->get_option('schedule-type', 'wpo_weekly');
-
-					// Backward compatibility
-					if ('wpo_otherweekly' == $schedule_type) $schedule_type = 'wpo_fortnightly';
-
-					$this_time = (86400 * 7);
-
-					switch ($schedule_type) {
-						case "wpo_daily":
-							$this_time = 86400;
-							break;
-
-						case "wpo_weekly":
-							$this_time = (86400 * 7);
-							break;
-
-						case "wpo_fortnightly":
-							$this_time = (86400 * 14);
-							break;
-
-						case "wpo_monthly":
-							$this_time = (86400 * 30);
-							break;
-					}
-
-					add_action('wpo_cron_event2', array($this, 'cron_action'));
-					wp_schedule_event((current_time("timestamp", 0) + $this_time - $gmt_offset), $schedule_type, 'wpo_cron_event2');
-					WP_DbOptimize()->log('running wp_schedule_event()');
-				}
-			}
-		}
-	}
-
-	/**
-	 * Clears all cron events
-	 *
-	 * @return void
-	 */
-	public function wpo_cron_deactivate() {
-		$cron_jobs = _get_cron_array();
-		foreach ($cron_jobs as $job) {
-			foreach (array_keys($job) as $hook) {
-				if (preg_match('/^wpo_/', $hook)) wp_unschedule_hook($hook);
-			}
-		}
-	}
-
 	/**
 	 * Message to debug
 	 *
@@ -374,79 +275,8 @@ class WP_DbOptimize {
 		return date_i18n(get_option('date_format').' @ '.get_option('time_format'), ($timestamp + get_option('gmt_offset') * 3600));
 	}
 
-	/**
-	 * Executed this function on cron event.
-	 *
-	 * @return void
-	 */
-	public function cron_action() {
-
-		$optimizer = $this->get_optimizer();
-		$options = $this->get_options();
-
-		$this->log('WPO: Starting cron_action()');
-
-		if ('true' == $options->get_option('schedule')) {
-			$this_options = $options->get_option('auto');
-
-			// Currently the output of the optimizations is not saved/used/logged.
-			$optimizer->do_optimizations($this_options, 'auto');
-		}
-
-	}
 
 
-	/**
-	 * Do plugin background tasks.
-	 *
-	 * @return void
-	 */
-	public function do_weekly_cron_tasks() {
-		// add tasks here.
-		$this->get_db_info()->update_plugin_json();
-	}
-
-	/**
-	 * This will customize a URL with a correct Affiliate link
-	 * This function can be update to suit any URL as longs as the URL is passed
-	 *
-	 * @param String  $url					  - URL to be check to see if it an dboptimize match.
-	 * @param String  $text					  - Text to be entered within the href a tags.
-	 * @param String  $html					  - Any specific HTML to be added.
-	 * @param String  $class				  - Specify a class for the href (including the attribute label)
-	 * @param Boolean $return_instead_of_echo - if set, then the result will be returned, not echo-ed.
-	 *
-	 * @return String|void
-	 */
-	public function wp_optimize_url($url, $text, $html = '', $class = '', $return_instead_of_echo = false) {
-		// Check if the URL is DbOptimize.
-		$url = $this->maybe_add_affiliate_params($url);		// Return URL - check if there is HTML such as images.
-		if ('' != $html) {
-			$result = '<a '.$class.' href="'.esc_attr($url).'">'.$html.'</a>';
-		} else {
-			$result = '<a '.$class.' href="'.esc_attr($url).'">'.htmlspecialchars($text).'</a>';
-		}
-		if ($return_instead_of_echo) return $result;
-		echo $result;
-	}
-
-	/**
-	 * Get an URL with an eventual affiliate ID
-	 *
-	 * @param string $url
-	 * @return string
-	 */
-	public function maybe_add_affiliate_params($url) {
-		// Check if the URL is DbOptimize.
-		if (false !== strpos($url, '//dboptimize.com')) {
-			// Set URL with Affiliate ID.
-			$url = add_query_arg(array('afref' => $this->get_notices()->get_affiliate_id()), $url);
-
-			// Apply filters.
-			$url = apply_filters('wpoptimize_dboptimize_com_link', $url);
-		}
-		return apply_filters('wpoptimize_maybe_add_affiliate_params', $url);
-	}
 
 
 	/**
