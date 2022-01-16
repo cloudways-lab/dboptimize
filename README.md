@@ -2,6 +2,9 @@
 
 Quick links: [Using](#using) | [Installing](#installing) | [Contributing](#contributing) | [Support](#support)
 
+DBOptimize is a WordPress WPCLI Plugin build and use for Cloudways Internal Operations, to optimize Database.
+Version: 1.1
+
 ## Using
 To view commands
 
@@ -70,7 +73,7 @@ Once you've done so, you can install the latest stable version of this package w
 To install the latest development version of this package, use the following command instead:
 
 ```bash
-wp package install /optimisation:dev-master
+wp package install /dboptimize:master
 ```
 
 ## Contributing
