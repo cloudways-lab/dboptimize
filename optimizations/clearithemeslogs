@@ -1,0 +1,71 @@
+<?php
+class WP_DbOptimization_clearithemeslogs extends WP_DbOptimization {
+
+	
+	private $table_found = false;
+
+	public function optimize() {
+		global $wpdb;
+		$table = $wpdb->prefix . "itsec_lockouts";
+		if ($wpdb->get_var("SHOW TABLES LIKE '" . $table . "'") == $table) {
+		$this->table_found = true;
+
+        $charset_collate        = $wpdb->get_charset_collate();
+        $lockouts_table         = $wpdb->prefix . 'itsec_lockouts';
+        $logs_table             = $wpdb->prefix . 'itsec_logs';
+        $dashboard_table        = $wpdb->prefix . 'itsec_dashboard_events';
+        $temp_table             = $wpdb->prefix . 'itsec_temp';
+        $storage_ds_table       = $wpdb->prefix . 'itsec_distributed_storage';
+
+        $wpdb->query("TRUNCATE TABLE " . $lockouts_table);
+        $wpdb->query("TRUNCATE TABLE " . $logs_table);
+        
+        if (function_exists('itsec_pro_load_textdomain')) { // if iTheme Sec Pro is activated
+            $wpdb->query("TRUNCATE TABLE " . $dashboard_table);
+        }
+        
+        $wpdb->query("TRUNCATE TABLE " . $temp_table);
+        $wpdb->query("TRUNCATE TABLE " . $storage_ds_table);
+       }  else {
+       		$this->table_found = false;
+       }
+
+	}
+
+	public function after_get_info() {
+		if ($this->table_found == false) {
+			$message = sprintf('No ithemes tables found', 'wp-dboptimize');
+			$this->logger->info($message);
+			$this->register_output($message);
+		}
+	}
+
+	public function get_info() {
+		global $wpdb;
+
+		$table = $wpdb->prefix . "itsec_lockouts";
+		if ($wpdb->get_var("SHOW TABLES LIKE '" . $table . "'") == $table) {
+			$this->table_found = false;
+		}
+	}
+
+	public function settings_label() {
+		return __('Clear Ithemes security logs', 'wp-dboptimize');
+	}
+
+	public function after_optimize() {
+		global $wpdb;
+		$table = $wpdb->prefix . "itsec_lockouts";
+		if ($wpdb->get_var("SHOW TABLES LIKE '" . $table . "'") == $table) {
+			$message = sprintf('Ithemes security logs cleaned');
+			$this->logger->info($message);
+			$this->register_output($message);
+		} else {
+			$message = sprintf('0 ithemes security logs cleaned', 'wp-dboptimize');
+			$this->logger->info($message);
+			$this->register_output($message);
+		}
+
+	}
+
+}

@@ -37,4 +37,3 @@ class WP_DbOptimization_woocommerce extends WP_DbOptimization {
 		return __('Clean woocommerce sessions', 'wp-dboptimize');
 	}
 }
-

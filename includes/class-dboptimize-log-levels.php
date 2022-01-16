@@ -1,12 +1,12 @@
 <?php
 
 
-if (class_exists('Updraft_Log_Levels')) return;
+if (class_exists('DbOptimize_Log_Levels')) return;
 
 /**
- * Class Updraft_Log_Levels
+ * Class DbOptimize_Log_Levels
  */
-class Updraft_Log_Levels {
+class DbOptimize_Log_Levels {
 
 	const EMERGENCY = 'emergency';
 	const ALERT = 'alert';

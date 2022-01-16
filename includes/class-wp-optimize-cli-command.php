@@ -146,36 +146,7 @@ class WP_DbOptimize_CLI_Command extends WP_CLI_Command {
 		}
 	}
 
-	/**
-	 * Handle cache commands.
-	 */
-	public function cache() {
-		$available_commands = array(
-			'enable' => 'enable',
-			'disable' => 'disable',
-			'purge' => 'purge_page_cache',
-			'preload' => 'run_cache_preload_cli',
-			'status' => 'get_status_info',
-		);
-
-		$command = isset($this->args[1]) ? $this->args[1] : '';
-
-		if (!array_key_exists($command, $available_commands)) {
-			WP_CLI::error(__('Undefined command', 'wp-optimize'));
-		}
-
-		if (!class_exists('WP_DbOptimize_Cache_Commands')) include_once(WPODB_PLUGIN_MAIN_PATH . 'cache/class-cache-commands.php');
-		$cache_commands = new WP_DbOptimize_Cache_Commands();
-
-		$result = call_user_func(array($cache_commands, $available_commands[$command]));
-
-		if (isset($result['error'])) {
-			WP_CLI::error($result['error']);
-		}
-
-		WP_CLI::success($result['message']);
-	}
-
+	
 	/**
 	 * Return instance of WP_DbOptimize_Commands.
 	 *
@@ -183,127 +154,11 @@ class WP_DbOptimize_CLI_Command extends WP_CLI_Command {
 	 */
 	private function get_commands() {
 		// Other commands, available for any remote method.
-		if (!class_exists('WP_DbOptimize_Commands')) include_once(WPODB_PLUGIN_MAIN_PATH.'includes/class-commands.php');
+		if (!class_exists('WP_DbOptimize_Commands')) include_once(WPODB_PLUGIN_MAIN_PATH.'includes/clas-dboptimize-commands.php');
 
 		return new WP_DbOptimize_Commands();
 	}
 
-	/**
-	 * Handle minification commands
-	 */
-	public function minify($params) {
-		
-		$available_commands = array(
-			'enable' => array(
-				'description' => __('Enable minification.', 'wp-optimize'). ' ' .sprintf(__('%s can be used to enable a specific minification feature.', 'wp-optimize'), '--feature=xxx')
-			),
-			'disable' => array(
-				'description' => __('Disable minification.', 'wp-optimize'). ' ' .sprintf(__('%s can be used to disable a specific minification feature.', 'wp-optimize'), '--feature=xxx')
-			),
-			'status' => array(
-				'description' => __('Get the current minification status.', 'wp-optimize')
-			),
-			'regenerate' => array(
-				'method_name' => 'purge_minify_cache',
-				'description' => __('Regenerate the minified files, and purge any supported page cache.', 'wp-optimize'),
-			),
-			'delete' => array(
-				'method_name' => 'purge_all_minify_cache',
-				'description' => __('Removed all created minified files created, and purge any supported page caches.', 'wp-optimize')
-			),
-		);
-
-		$command = isset($this->args[1]) ? $this->args[1] : '';
-
-		// if no command was specified, send the list of available commands
-		if (!$command) {
-			WP_CLI::log(__('The following commands are available for the minification feature:', 'wp-optimize'));
-			foreach ($available_commands as $command_name => $command_data) {
-				WP_CLI::log(sprintf("     %-20s %s", $this->colorize($command_name, 'bright'), $command_data['description']));
-			}
-			return;
-		}
-
-		if (!array_key_exists($command, $available_commands)) {
-			WP_CLI::error(__('Undefined command', 'wp-optimize'));
-		}
-
-		if (!class_exists('WP_DbOptimize_Minify_Commands')) include_once(__DIR__ . '/minify/class-wp-optimize-minify-commands.php');
-		$minify_commands = new WP_DbOptimize_Minify_Commands();
-
-		// Handle activating / deactivating
-		if ('enable' === $command || 'disable' === $command) {
-			// Enable or disable minify
-			if (!isset($params['feature'])) {
-				$saved = $minify_commands->save_minify_settings(array('enabled' => 'enable' === $command));
-				if ($saved['success']) {
-					WP_CLI::success(__('WP-Optimize minification status was successfully changed.', 'wp-optimize'));
-				} else {
-					WP_CLI::error(__('WP-Optimize minification status could not be changed.', 'wp-optimize'));
-				}
-				return;
-			} else {
-				switch($params['feature']) {
-					case 'js':
-						$saved = $minify_commands->save_minify_settings(array('enable_js' => 'enable' === $command));
-						if ($saved['success']) {
-							WP_CLI::success(__('JavaScript minification status was successfully changed.', 'wp-optimize'));
-						} else {
-							WP_CLI::error(__('JavaScript minification status could not be changed.', 'wp-optimize'));
-						}
-						break;
-					case 'css':
-						$saved = $minify_commands->save_minify_settings(array('enable_css' => 'enable' === $command));
-						if ($saved['success']) {
-							WP_CLI::success(__('CSS minification status was successfully changed.', 'wp-optimize'));
-						} else {
-							WP_CLI::error(__('CSS minification status could not be changed.', 'wp-optimize'));
-						}
-						break;
-					case 'html':
-						$saved = $minify_commands->save_minify_settings(array('html_minification' => 'enable' === $command));
-						if ($saved['success']) {
-							WP_CLI::success(__('HTML minification status was successfully changed.', 'wp-optimize'));
-						} else {
-							WP_CLI::error(__('HTML minification status could not be changed.', 'wp-optimize'));
-						}
-						break;
-					default:
-						WP_CLI::error(sprintf(__('"%s" is not a feature.', 'wp-optimize'), $params['feature']));
-						break;
-				}
-				return;
-			}
-		}
-
-		// Show the current status
-		if ('status' == $command) {
-			$status = $minify_commands->get_status();
-			WP_CLI::log(__('WP-Optimize minification status:', 'wp-optimize'));
-			WP_CLI::log(' - '.sprintf(_x('<inification is %s', '%s is replaced by a colored version of enabled or disabled (WP_CLI)', 'wp-optimize'), ($status['enabled'] ? $this->colorize(__('enabled', 'wp-optimize'), 'green_bright') : $this->colorize(__('disabled', 'wp-optimize'), 'red_bright'))));
-			WP_CLI::log(' - '.sprintf(__('JavaScript minification: %s', 'wp-optimize'), ($status['js'] ? $this->colorize(__('ON', 'wp-optimize'), 'green_bright') : $this->colorize(__('OFF', 'wp-optimize'), 'red_bright'))));
-			WP_CLI::log(' - '.sprintf(__('CSS minification: %s', 'wp-optimize'), ($status['css'] ? $this->colorize(__('ON', 'wp-optimize'), 'green_bright') : $this->colorize(__('OFF', 'wp-optimize'), 'red_bright'))));
-			WP_CLI::log(' - '.sprintf(__('HTML minification: %s', 'wp-optimize'), ($status['html'] ? $this->colorize(__('ON', 'wp-optimize'), 'green_bright') : $this->colorize(__('OFF', 'wp-optimize'), 'red_bright'))));
-			WP_CLI::log(' - '.sprintf(__('Size on disk: %s', 'wp-optimize'), $this->colorize($status['stats']['cachesize'], 'bright')));
-			WP_CLI::log(' - '.sprintf(__('Cache date: %s', 'wp-optimize'), $this->colorize($status['stats']['cacheTime'], 'bright')));
-			WP_CLI::log(' - '.sprintf(__('Number of CSS files: %s', 'wp-optimize'), $this->colorize(count($status['stats']['css']), 'bright')));
-			WP_CLI::log(' - '.sprintf(__('Number of JavaScript files: %s', 'wp-optimize'), $this->colorize(count($status['stats']['js']), 'bright')));
-			WP_CLI::log(' - '.sprintf(__('Cache path: %s', 'wp-optimize'), $this->colorize(count($status['stats']['cachePath']), 'bright')));
-			return;
-		}
-
-		// Other commands
-		if (isset($available_commands[$command]['method_name']) && method_exists($minify_commands, $available_commands[$command]['method_name'])) {
-			$result = call_user_func(array($minify_commands, $available_commands[$command]['method_name']));
-			if (isset($result['error'])) {
-				WP_CLI::error($result['error']);
-			}
-
-			if (isset($result['message'])) {
-				WP_CLI::success($result['message']);
-			}
-		}
-	}
 
 	private function colorize($string, $color) {
 		$tokens = array(

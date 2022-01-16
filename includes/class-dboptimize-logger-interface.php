@@ -1,7 +1,7 @@
 <?php
 
 
-if (class_exists('Updraft_Logger_Interface')) return false;
+if (class_exists('DbOptimize_Logger_Interface')) return false;
 
 /**
  * Describes a logger instance
@@ -18,7 +18,7 @@ if (class_exists('Updraft_Logger_Interface')) return false;
  * See https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md
  * for the full interface specification.
  */
-interface Updraft_Logger_Interface {
+interface DbOptimize_Logger_Interface {
 	/**
 	 * System is unusable.
 	 *
