@@ -1,7 +1,6 @@
 <?php
 
 require_once('class-dboptimize-logger-interface.php');
-require_once('class-dboptimize-log-levels.php');
 require_once('class-dboptimize-logger.php');
 
 if (class_exists('DbOptimize_Logger')) return;
