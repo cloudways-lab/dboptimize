@@ -153,116 +153,6 @@ class WP_DbOptimize_Options {
 	}
 
 	/**
-	 * Save options
-	 *
-	 * @return array
-	 */
-	public function save_settings($settings) {
-		$output = array('messages' => array(), 'errors' => array());
-		if (!empty($settings["enable-schedule"])) {
-			$this->update_option('schedule', 'true');
-			
-			wpo_cron_deactivate();
-			
-			if (isset($settings["schedule_type"])) {
-				$schedule_type = (string) $settings['schedule_type'];
-				$this->update_option('schedule-type', $schedule_type);
-			} else {
-				$this->update_option('schedule-type', 'wpo_weekly');
-			}
-			
-			WP_DbOptimize()->cron_activate();
-		} else {
-			$this->update_option('schedule', 'false');
-			$this->update_option('schedule-type', 'wpo_weekly');
-			wpo_cron_deactivate();
-		}
-
-		if (!empty($settings["enable-retention"])) {
-			$retention_period = (int) $settings['retention-period'];
-			$this->update_option('retention-enabled', 'true');
-			$this->update_option('retention-period', $retention_period);
-		} else {
-			$this->update_option('retention-enabled', 'false');
-		}
-
-		if (!empty($settings["enable-revisions-retention"])) {
-			$revisions_retention_count = (int) $settings['revisions-retention-count'];
-			$this->update_option('revisions-retention-enabled', 'true');
-			$this->update_option('revisions-retention-count', $revisions_retention_count);
-		} else {
-			$this->update_option('revisions-retention-enabled', 'false');
-		}
-
-		// Get saved admin menu value before check.
-		$saved_admin_bar = $this->get_option('enable-admin-menu', 'false');
-
-		// Set refresh of default false so it doesnt refresh after save.
-		$output['refresh'] = false;
-
-		if (!empty($settings['enable-admin-bar'])) {
-			$this->update_option('enable-admin-menu', 'true');
-		} else {
-			$this->update_option('enable-admin-menu', 'false');
-		}
-
-		// Make sure inbound input is a string.
-		$updated_admin_bar = (isset($settings['enable-admin-bar']) && $settings['enable-admin-bar']) ? 'true' : 'false';
-		
-		// Check if the value is refreshed .
-		if ($saved_admin_bar != $updated_admin_bar) {
-			// Set refresh to true as the values have changed.
-			$output['refresh'] = true;
-		}
-
-		// Save cache toolbar display setting
-		$saved_enable_cache_in_admin_bar = $this->get_option('enable_cache_in_admin_bar', true);
-		if ($saved_enable_cache_in_admin_bar != $settings['enable_cache_in_admin_bar']) {
-			$this->update_option('enable_cache_in_admin_bar', $settings['enable_cache_in_admin_bar']);
-			$output['refresh'] = true;
-		}
-
-		do_action("auto_option_settings", $settings);
-
-		/** Save multisite options */
-		if (isset($settings['wpo-sites-cron'])) {
-			$this->update_option('wpo-sites-cron', $settings['wpo-sites-cron']);
-		}
-
-		if (isset($settings['wpo-sites'])) {
-			$this->save_wpo_sites_option($settings['wpo-sites']);
-		}
-
-		/** Save logging options */
-		$logger_type = isset($settings['wpo-logger-type']) ? $settings['wpo-logger-type'] : '';
-		$logger_options = isset($settings['wpo-logger-options']) ? $settings['wpo-logger-options'] : '';
-		
-		$this->update_option('logging', $logger_type);
-		$this->update_option('logging-additional', $logger_options);
-
-		// Save selected optimization settings.
-		if (isset($settings['optimization-options'])) {
-			$this->save_sent_manual_run_optimization_options($settings['optimization-options'], false, false);
-		}
-
-		// Save auto backup option value.
-		$enable_auto_backup = (isset($settings['enable-auto-backup']) ? 'true' : 'false');
-		$this->update_option('enable-auto-backup', $enable_auto_backup);
-
-		// Save additional auto backup option values.
-		$this->save_additional_auto_backup_options($settings);
-
-		// Save force DB optimization value.
-		$enable_db_force_optimize = (isset($settings['innodb-force-optimize']) ? 'true' : 'false');
-		$this->update_option('enable-db-force-optimize', $enable_db_force_optimize);
-
-		$output['messages'][] = __('Settings updated.', 'wp-optimize');
-
-		return $output;
-
-	}
-
-	/**
 	 * Wipe all options from database options tables.
 	 *
 	 * @return bool|false|int
@@ -283,10 +173,7 @@ class WP_DbOptimize_Options {
 
 		// disable cache and clean any information related to WP-Optimize Cache.
 		WP_DbOptimize()->get_page_cache()->clean_up();
-		// delete settings from .htaccess
-		WP_DbOptimize::get_browser_cache()->disable();
-		WP_DbOptimize::get_gzip_compression()->disable();
-
+		
 		// delete settings from options table.
 		$keys = '"' . implode('", "', $this->get_additional_settings_keys()) . '"';
 
@@ -402,8 +289,7 @@ class WP_DbOptimize_Options {
 			$this->update_option('schedule', 'false', $deprecated, $autoload_no);
 			$this->update_option('last-optimized', 'Never', $deprecated, $autoload_no);
 			$this->update_option('schedule-type', 'wpo_weekly', $deprecated, $autoload_no);
-			// Deactivate cron.
-			wpo_cron_deactivate();
+			
 		}
 
 		if (false === $this->get_option('retention-enabled')) {
