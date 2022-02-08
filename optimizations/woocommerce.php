@@ -28,7 +28,7 @@ class WP_DbOptimization_woocommerce extends WP_DbOptimization {
 	}
 
 	public function get_info() {
-        $sql = "SELECT COUNT(*) FROM `" . $this->wpdb->options . "options` WHERE option_name like='_wc_session_%' OR option_name LIKE '_wc_session_expires_%' `);";
+        $sql = "SELECT COUNT(*) FROM `" . $this->wpdb->options . "` WHERE option_name LIKE '_wc_session_%' OR option_name LIKE '_wc_session_expires_%';";
 		$sessionData = $this->wpdb->get_var($sql);
 		$this->found_count += $sessionData;
 	}
