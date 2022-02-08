@@ -123,7 +123,7 @@ class WP_DbOptimization_postmeta extends WP_DbOptimization {
 
 		$this->found_count += $postmeta;
 
-		$sql = "SELECT COUNT(*) FROM `".$this->wpdb->postmeta." WHERE meta_key like '%_oembed%'`";
+		$sql = "SELECT COUNT(*) FROM `".$this->wpdb->postmeta."` WHERE meta_key like '%_oembed%'";
 		$postmeta = $this->wpdb->get_var($sql);
 		$this->found_count += $postmeta;
 
