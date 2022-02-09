@@ -170,13 +170,22 @@ class WP_DbOptimizer {
 	 * @return array                             Array of results from the optimization.
 	 */
 	public function do_optimization($which_optimization) {
-		
 		$optimization = (is_object($which_optimization) && is_a($which_optimization, 'WP_DbOptimization')) ? $which_optimization : $this->get_optimization($which_optimization);
-
+		
 		if (is_wp_error($optimization)) {
 			WP_DbOptimize()->log('Error occurred. Unknown optimization.');
 			return $optimization;
 		}
+		$data = $optimization->get_data();
+		if (isset($data['dry'])){
+			if (method_exists($optimization, 'dry_run')){
+				$optimization->dry_run();
+				$results = $optimization->get_results();
+				return $results;
+			}
+		}
+
+		
 
 		WP_DbOptimize()->change_time_limit();
 

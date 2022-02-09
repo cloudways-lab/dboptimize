@@ -24,7 +24,7 @@ class WP_Optm_CLI_Command extends WP_CLI_Command {
 	public function __invoke($args, $assoc_args) { // phpcs:ignore PHPCompatibility.FunctionNameRestrictions.NewMagicMethods.__invokeFound
 
 		$this->args = $args;
-		if ($assoc_args && $assoc_args['time']) {
+		if ($assoc_args && isset($assoc_args['time']) && $assoc_args['time']) {
 			if (!class_exists('WP_DbOptimize_Options')) include_once('includes/class-wp-optimize-options.php');
 			$optimizationOptions = new WP_DbOptimize_Options();
 			$optimizationOptions->update_option('retention-enabled', 'true');
@@ -42,6 +42,7 @@ class WP_Optm_CLI_Command extends WP_CLI_Command {
 			$args[0] = str_replace('-', '_', $args[0]);
 		}
 		
+		
 		if (!empty($args) && is_callable(array($this, $args[0])) && ($args[0] === 'optimizations' || $args[0] === 'version' || $args[0] === 'sites')) {
 			call_user_func(array($this, $args[0]), $assoc_args);
 			return;
@@ -57,7 +58,7 @@ class WP_Optm_CLI_Command extends WP_CLI_Command {
 			return;
 		}
 		
-	
+		
 		
 	
 		WP_CLI::log('usage: wp dboptimize <command> <optimization-id> [--site-id=<site-id>] [--param1=value1] [--param2=value2] ...');
@@ -160,7 +161,8 @@ class WP_Optm_CLI_Command extends WP_CLI_Command {
 				$assoc_args['optimization-id'] = $args;			
 			}	
 		}
-
+		
+		
 		if (isset($assoc_args['site-id'])) {
 			$assoc_args['site_id'] = array_values(array_map('trim', explode(',', $assoc_args['site-id'])));
 		}
