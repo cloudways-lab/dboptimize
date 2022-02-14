@@ -29,7 +29,7 @@ To view all optimizations
 
     actionscheduler          Delete Action schedulers
     optimizetables           Optimize database tables
-    wpindexfixer             Adds Indexes to WordPress default tables ( not included to all )
+    wpindexfixer             Adds Indexes to WordPress default tables ( not included to all ). Includes dry run command: wp dboptimize do-optimization wpindexfixer --dry
     revisions                Clean all post revisions
     autodraft                Clean all auto-draft posts
     trash                    Clean all trashed posts
@@ -55,6 +55,8 @@ wp dboptimize do-optimization trash
 Likewise replace "trash" with any other commands available above
 
 ## Changes Log
+v1.1.1
+* Added dryrun command for wpindexfixer: wp dboptimize do-optimization wpindexfixer --dry
 v1.1
 * Added Actions for Automation Testing
 v1.0.1
