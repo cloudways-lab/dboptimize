@@ -483,4 +483,8 @@ abstract class WP_DbOptimization {
 
 		return $link;
 	}
+	public function get_data()
+	{
+		return $this->data;
+	}
 }

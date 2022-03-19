@@ -20,8 +20,8 @@ class WP_DbOptimization_actionscheduler extends WP_DbOptimization {
 			$sql_scheduled_hook = "DELETE lg FROM ".$prefix."actionscheduler_logs lg
 									LEFT JOIN ".$prefix."actionscheduler_actions aa
 									ON aa.action_id = lg.action_id
-									WHERE aa.status IS 'pending'
-									AND aa.hook IS 'woocommerce_deliver_webhook_async'";
+									WHERE aa.status ='pending'
+									AND aa.hook ='woocommerce_deliver_webhook_async'";
 			$wpdb->query($sql_scheduled_hook);
 
 			// delete trashed scheduled webhook action 
