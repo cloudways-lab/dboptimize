@@ -44,6 +44,7 @@ To view all optimizations
     clearitemeslogs          Clean Ithemes Log files
     woocommerce              Clean Sessions for woocommerce
     postmeta                 Clean Post Meta ( embed leftovers etc )
+    general                  Cleans Following Tables: cleantalk_sfw & wfknownfilelist & wfpendingissues & wffilemods & email_stats & cerber_lab & cerber_lab_ip &                                    bv_ip_store & rank_math_404_logs
 
 
 
@@ -55,6 +56,8 @@ wp dboptimize do-optimization trash
 Likewise replace "trash" with any other commands available above
 
 ## Changes Log
+v1.1
+* Added Command: general
 v1.1
 * Added Actions for Automation Testing
 v1.0.1
