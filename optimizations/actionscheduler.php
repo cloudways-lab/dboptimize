@@ -1,6 +1,7 @@
 <?php
 class WP_DbOptimization_actionscheduler extends WP_DbOptimization {
 
+	private $table_found = false;
 	
 	public function optimize() {
 		global $wpdb;
@@ -32,7 +33,7 @@ class WP_DbOptimization_actionscheduler extends WP_DbOptimization {
 
 
 		} else {
-			$table_found = false;
+			$this->table_found = false;
 		}
 
 	}

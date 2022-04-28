@@ -125,30 +125,41 @@ class WP_DbOptimization_revisions extends WP_DbOptimization {
 			" WHERE post_type = 'revision'".
 			" GROUP BY `post_parent`".
 			" ORDER BY `post_parent`";
-
+	
 		$results = $this->wpdb->get_results($sql, ARRAY_N);
 		$post_parents = array();
 		$revisions = '';
+
+
 		foreach ($results as $row) {
 			array_push($post_parents, $row[0]);
 			$tmp = explode(',', $row[1]);
+
 			rsort($tmp);
 			$tmp = implode(',', array_slice($tmp, $this->revisions_retention_count));
+			
 			$revisions .= $tmp . ',';
 		}
-		$revisions = rtrim($revisions, ',');
-		$revisions = explode(',', $revisions);
 
-		while (count($revisions) > 0) {
+		
+		if ($revisions !== ',') {
+			$revisions = rtrim($revisions, ',');
+			$revisions = explode(',', $revisions);	
+			while (count($revisions) > 0) {
 			$delete_this_time = array_splice($revisions, 0, min(count($revisions), 250));
-			$clean = "DELETE FROM `" . $this->wpdb->posts . "` WHERE `ID` IN (" . implode(',', $delete_this_time) . ")";
-			$count = $this->query($clean);
-			$this->processed_count += $count;
-		}
+				$clean = "DELETE FROM `" . $this->wpdb->posts . "` WHERE `ID` IN (" . implode(',', $delete_this_time) . ")";
+				$count = $this->query($clean);
+				$this->processed_count += $count;
+			}
 
+		}
+		
+
+		
 		// clean orphaned post meta.
 		$clean = "DELETE pm FROM `" . $this->wpdb->postmeta . "` pm LEFT JOIN `" . $this->wpdb->posts . "` p ON pm.post_id = p.ID WHERE p.ID IS NULL";
 		$this->query($clean);
+
 	}
 
 	/**
